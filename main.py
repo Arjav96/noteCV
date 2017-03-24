@@ -1,6 +1,6 @@
 import sys, time, MySQLdb
 from PyQt4 import QtGui, QtCore
-from constants import *
+from constants1 import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
