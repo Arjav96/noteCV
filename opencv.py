@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import random
 
 
 #Colors			=	(  R,   G,   B)
@@ -30,18 +31,6 @@ font	=	cv2.FONT_HERSHEY_SIMPLEX
 
 
 
-#Values
-WIDTH					=	640
-HEIGHT					=	480
-COLOR 					=	(0, 0, 0)
-prevx, prevy 			= 	-1, -1 			#Storing previous cooordinates
-drawit					=	False
-cursorx, cursory		=	-1, -1
-coorX					=	[]
-coorY					=	[]
-show 					= 	np.ndarray((HEIGHT, WIDTH, 3))
-Isgraph					=	False
-
 
 
 '''def mouseEvent(event, x, y, flags, param):
@@ -55,23 +44,36 @@ Isgraph					=	False
 '''
 
 
-def draw(choice):
+def draw(subjectName, choice):
 	cap = cv2.VideoCapture(0)
+
+	#Values
+	WIDTH					=	640
+	HEIGHT					=	480
+	COLOR 					=	(0, 0, 0)
+	prevx, prevy 			= 	-1, -1 			#Storing previous cooordinates
+	drawit					=	False
+	cursorx, cursory		=	-1, -1
+	coorX					=	[]
+	coorY					=	[]
+	show 					= 	np.ndarray((HEIGHT, WIDTH, 3))
+	Isgraph					=	False
 
 	cap.set(3, WIDTH)
 	cap.set(4, HEIGHT)
 	#print cap.get(4),cap.get(3)
 
-	
 	display = np.ndarray((int(cap.get(4)) + 100, int(cap.get(3)), 3))
 	
+	fileName = None
+
 	if choice == 1:				#Make diagram
 		show.fill(255)
 	if choice == 2:
 		show = cv2.imread("graph.jpg")	#Make graph
 	#display.fill(255)
 
-	global COLOR, prevx, prevy, drawit, cursorx, cursory, show
+	
 
 	
 	cv2.namedWindow("noteCV")
@@ -222,9 +224,12 @@ def draw(choice):
 			COLOR = (255, 0, 0)
 		elif k == ord('l') or k == ord('L'):
 			pass
-		
+		elif k == ord('s') or k == ord('S') :
+			fileName = subjectName + "/" + str(random.randint(0,1000000)) + str(".jpg")
+			cv2.imwrite(fileName, show)
+			break
+
 	cv2.destroyAllWindows()
 	cap.release()
 
-
-#draw(2)
+	return fileName
