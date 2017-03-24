@@ -1,8 +1,9 @@
-import sys, time, MySQLdb
+import sys, time, MySQLdb, thread
 from PyQt4 import QtGui, QtCore
-from constants1 import *
+from UIconstants import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+import Main as Main
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -196,8 +197,8 @@ class NoteWidget(QtGui.QWidget):
 
 	def buildUI(self, subject):
 
-		self.vertLayout = QtGui.QGridLayout()
-	#	self.vertLayout.stretch(2)
+		self.vertLayout = QtGui.QVBoxLayout()
+		self.vertLayout.stretch(2)
 		self.setGeometry(220,170,WIDTH-220,HEIGHT-170)
 		self.show()
 	#	self.setStyleSheet('border: 2px SOLID black;')
@@ -212,19 +213,22 @@ class NoteWidget(QtGui.QWidget):
 		self.addNewNoteBtn.clicked.connect(self.addNote)
 		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
 
-		for i in xrange(0,5):
-			self.vertLayout.setRowMinimumHeight(i,100)
-			for j in xrange(0,10):
-				# self.vertLayout.setColumnMinimumWidth(j,100)
-				self.vertLayout.addWidget(QPushButton('btn',self), i, j, 10, 10)
+		# for i in xrange(0,5):
+		# 	self.vertLayout.setRowMinimumHeight(i,100)
+		# 	for j in xrange(0,10):
+		# 		# self.vertLayout.setColumnMinimumWidth(j,100)
+		# 		self.vertLayout.addWidget(QPushButton('btn',self), i, j, 10, 10)
 
-		self.vertLayout.setColumnMinimumWidth(3,200)
+	#	self.vertLayout.setColumnMinimumWidth(3,200)
 #		self.vertLayout.setColumnStretch(4,5)
 
-#		self.vertLayout.addWidget(self.addNewNoteBtn)
+		self.vertLayout.addWidget(self.addNewNoteBtn)
 
 	def addNote(self):
-		return
+		
+		editorWindow = Main.Editor()
+		editorWindow.exec_()
+
 
 
 class Dashboard(QtGui.QWidget):

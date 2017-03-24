@@ -1,7 +1,7 @@
 import sys
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QFont
-from constants import *
+from UIconstants import *
 import opencv as opencv
 
 class TextEditor(QtGui.QTextEdit) :
@@ -185,20 +185,21 @@ class Widget(QtGui.QWidget) :
 
 class Editor(QtGui.QMainWindow) :
 
-	def __init__(self, parent = None) :
-		super(Editor, self).__init__(parent)
+	def __init__(self) :
+		super(Editor, self).__init__()
 		self.makeUI()
 
 	def makeUI(self) :
 		self.textWidget = Widget(self)
 		self.move(0,0)
 		self.resize(WIDTH, HEIGHT)
-		self.setCentralWidget(self.textWidget)		
+		print("Hello")
+		self.setCentralWidget(self.textWidget)	
+		self.show()
 
-def main() :
-	app = QtGui.QApplication(sys.argv)
-	editorWindow = Editor()
-	editorWindow.show()
-	sys.exit(app.exec_())
+# def main() :
+# 	app = QtGui.QApplication(sys.argv)
+# 	print("Buffalo")
+# 	sys.exit(app.exec_())
 
-main()
+# # main()

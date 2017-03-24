@@ -26,6 +26,15 @@ STARTWINDOW = (10,10)
 mainTitle = 'NoteCV'
 
 
+STARTPOS	=		(0,0)
+
+HEADFONT	=		30
+SUBHEADFONT	=		25
+PARAFONT	=		15
+
+STARTPOSEDITOR	=	(200,100)
+
+
 font1 = QtGui.QFont()
 font1.setFamily(_fromUtf8("Sawasdee"))
 font1.setPointSize(16)
