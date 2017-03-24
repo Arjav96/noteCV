@@ -32,6 +32,35 @@ class TextEditor(QtGui.QTextEdit) :
 		self.setFontPointSize(PARAFONT)		
 		self.setAlignment(QtCore.Qt.AlignLeft)
 
+	def setBoldFont(self) :
+		if self.fontWeight() != QFont.Black :
+			self.setFontWeight(QFont.Black)
+		else :
+			self.setFontWeight(QFont.Normal)
+
+	def setItalicFont(self) :
+		self.setFontItalic(not self.fontItalic())
+
+	def setUnderlineFont(self) :
+		self.setFontUnderline(not self.fontUnderline())
+
+	def addImage(self) :
+		loc = "1.jpg"
+		image = QtGui.QImage(loc, 'JPG')
+		cursor = QtGui.QTextCursor(self.document())
+
+		cursor.movePosition(QtGui.QTextCursor.End,QtGui.QTextCursor.MoveAnchor)
+		cursor.insertImage(image, loc)
+		#cursor.insertImage(QtCore.QString(loc))
+
+	def setLeftAlign(self) :
+		self.setAlignment(QtCore.Qt.AlignLeft)
+
+	def setCenterAlign(self) :
+		self.setAlignment(QtCore.Qt.AlignCenter)
+
+	def setRightAlign(self) :
+		self.setAlignment(QtCore.Qt.AlignRight)
 
 class Widget(QtGui.QWidget) :
 	# Widget class inherited from QWidget
@@ -60,7 +89,36 @@ class Widget(QtGui.QWidget) :
 		self.paragraphBtn.clicked.connect(self.textEditor.setParagraphFormat)
 		self.paragraphBtn.move(200,500)
 
+		self.boldBtn = QtGui.QPushButton("BOLD",self)
+		self.boldBtn.clicked.connect(self.textEditor.setBoldFont)
+		self.boldBtn.move(300,500)
+
+		self.italicBtn = QtGui.QPushButton("ITALICS",self)
+		self.italicBtn.clicked.connect(self.textEditor.setItalicFont)
+		self.italicBtn.move(350,500)
+
+		self.underlineBtn = QtGui.QPushButton("UNDERLINE",self)
+		self.underlineBtn.clicked.connect(self.textEditor.setUnderlineFont)
+		self.underlineBtn.move(400,500)
+
+		self.imageBtn = QtGui.QPushButton("ADD DIAGRAM",self)
+		self.imageBtn.clicked.connect(self.textEditor.addImage)
+		self.imageBtn.move(500,500)
+
+		self.leftBtn = QtGui.QPushButton("LEFT",self)
+		self.leftBtn.clicked.connect(self.textEditor.setLeftAlign)
+		self.leftBtn.move(0,600)
+
+		self.centerBtn = QtGui.QPushButton("CENTER",self)
+		self.centerBtn.clicked.connect(self.textEditor.setCenterAlign)
+		self.centerBtn.move(100,600)
+
+		self.rightBtn = QtGui.QPushButton("RIGHT",self)
+		self.rightBtn.clicked.connect(self.textEditor.setRightAlign)
+		self.rightBtn.move(150,600)
  
+
+
 class Editor(QtGui.QMainWindow) :
 
 	def __init__(self, parent = None) :
