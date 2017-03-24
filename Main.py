@@ -10,8 +10,6 @@ class TextEditor(QtGui.QTextEdit) :
 	def __init__(self, parent = None) :
 		super(TextEditor,self).__init__(parent)
 
-		self.resize(800,500)
-
 		font = self.font()
 		font.setPointSize(PARAFONT)
 		self.setFont(font)
@@ -44,15 +42,6 @@ class TextEditor(QtGui.QTextEdit) :
 	def setUnderlineFont(self) :
 		self.setFontUnderline(not self.fontUnderline())
 
-	def addImage(self) :
-		loc = "1.jpg"
-		image = QtGui.QImage(loc, 'JPG')
-		cursor = QtGui.QTextCursor(self.document())
-
-		cursor.movePosition(QtGui.QTextCursor.End,QtGui.QTextCursor.MoveAnchor)
-		cursor.insertImage(image, loc)
-		#cursor.insertImage(QtCore.QString(loc))
-
 	def setLeftAlign(self) :
 		self.setAlignment(QtCore.Qt.AlignLeft)
 
@@ -61,6 +50,25 @@ class TextEditor(QtGui.QTextEdit) :
 
 	def setRightAlign(self) :
 		self.setAlignment(QtCore.Qt.AlignRight)
+
+	def setHighlight(self) :
+		if self.textBackgroundColor() != QtGui.QColor(255,255,0) :
+			self.setTextBackgroundColor(QtGui.QColor(255,255,0))
+		else :
+			self.setTextBackgroundColor(QtGui.QColor(255,255,255))
+
+	def addDiagram(self) :
+		loc = "1.jpg"
+		image = QtGui.QImage(loc, 'JPG')
+		cursor = QtGui.QTextCursor(self.document())
+
+		cursor.movePosition(QtGui.QTextCursor.End,QtGui.QTextCursor.MoveAnchor)
+
+		cursor.insertImage(image, loc)
+		#cursor.insertImage(QtCore.QString(loc))
+
+	def addGraph(self) :
+		return
 
 class Widget(QtGui.QWidget) :
 	# Widget class inherited from QWidget
@@ -74,50 +82,99 @@ class Widget(QtGui.QWidget) :
 	def createTextEditor(self) :
 		# Create text editor of the 
 		self.textEditor = TextEditor(self)
+		self.textEditor.move(STARTPOSEDITOR[0], STARTPOSEDITOR[1])
+		self.textEditor.resize(WIDTH - STARTPOSEDITOR[0]-40, HEIGHT-STARTPOSEDITOR[1]-40)
 
 	def createQuickAccessToolbar(self) :
 		# Create quick access tooolbar for easy access
+
+		# Heading button
 		self.headingBtn = QtGui.QPushButton("HEADING",self)
 		self.headingBtn.clicked.connect(self.textEditor.setHeadingFormat)
-		self.headingBtn.move(0,500)
+		self.headingBtn.move(20,STARTPOSEDITOR[1]+10)
+		self.headingBtn.resize(STARTPOSEDITOR[0]-35, 40)
 
+		# Sub Heading Button
 		self.subHeadingBtn = QtGui.QPushButton("SUB HEADING",self)
 		self.subHeadingBtn.clicked.connect(self.textEditor.setSubHeadingFormat)
-		self.subHeadingBtn.move(100,500)
+		self.subHeadingBtn.move(20,STARTPOSEDITOR[1]+10+60)
+		self.subHeadingBtn.resize(STARTPOSEDITOR[0]-35, 40)
 
+		# Paragraph Button
 		self.paragraphBtn = QtGui.QPushButton("PARAGRAPH",self)
 		self.paragraphBtn.clicked.connect(self.textEditor.setParagraphFormat)
-		self.paragraphBtn.move(200,500)
+		self.paragraphBtn.move(20,STARTPOSEDITOR[1]+10+60+60)
+		self.paragraphBtn.resize(STARTPOSEDITOR[0]-35, 40)
 
-		self.boldBtn = QtGui.QPushButton("BOLD",self)
+		# Bold Button
+		self.boldBtn = QtGui.QPushButton("",self)
 		self.boldBtn.clicked.connect(self.textEditor.setBoldFont)
-		self.boldBtn.move(300,500)
+		self.boldBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60)
+		self.boldBtn.resize(40, 40)
+		self.boldBtn.setIcon(QtGui.QIcon('./images/icons/bold.png'))
+		self.boldBtn.setIconSize(QtCore.QSize(35,35))
 
-		self.italicBtn = QtGui.QPushButton("ITALICS",self)
+		# Italics Button
+		self.italicBtn = QtGui.QPushButton("",self)
 		self.italicBtn.clicked.connect(self.textEditor.setItalicFont)
-		self.italicBtn.move(350,500)
+		self.italicBtn.move(84,STARTPOSEDITOR[1]+10+60+60+60)
+		self.italicBtn.resize(40, 40)
+		self.italicBtn.setIcon(QtGui.QIcon('./images/icons/italics.png'))
+		self.italicBtn.setIconSize(QtCore.QSize(20,20))
 
-		self.underlineBtn = QtGui.QPushButton("UNDERLINE",self)
+
+		# UnderLine button
+		self.underlineBtn = QtGui.QPushButton("",self)
 		self.underlineBtn.clicked.connect(self.textEditor.setUnderlineFont)
-		self.underlineBtn.move(400,500)
+		self.underlineBtn.move(73+73,STARTPOSEDITOR[1]+10+60+60+60)
+		self.underlineBtn.resize(40, 40)
+		self.underlineBtn.setIcon(QtGui.QIcon('./images/icons/underline.png'))
+		self.underlineBtn.setIconSize(QtCore.QSize(25,25))
 
-		self.imageBtn = QtGui.QPushButton("ADD DIAGRAM",self)
-		self.imageBtn.clicked.connect(self.textEditor.addImage)
-		self.imageBtn.move(500,500)
 
-		self.leftBtn = QtGui.QPushButton("LEFT",self)
+		# Left alignment :)
+		self.leftBtn = QtGui.QPushButton("",self)
 		self.leftBtn.clicked.connect(self.textEditor.setLeftAlign)
-		self.leftBtn.move(0,600)
+		self.leftBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60)
+		self.leftBtn.resize(40, 40)
+		self.leftBtn.setIcon(QtGui.QIcon('./images/icons/left-align.png'))
+		self.leftBtn.setIconSize(QtCore.QSize(35,35))
 
-		self.centerBtn = QtGui.QPushButton("CENTER",self)
+		# Center align button
+		self.centerBtn = QtGui.QPushButton("",self)
 		self.centerBtn.clicked.connect(self.textEditor.setCenterAlign)
-		self.centerBtn.move(100,600)
+		self.centerBtn.move(84,STARTPOSEDITOR[1]+10+60+60+60+60)
+		self.centerBtn.resize(40, 40)
+		self.centerBtn.setIcon(QtGui.QIcon('./images/icons/center-align.png'))
+		self.centerBtn.setIconSize(QtCore.QSize(34,34))
 
-		self.rightBtn = QtGui.QPushButton("RIGHT",self)
+		# Right button
+		self.rightBtn = QtGui.QPushButton("",self)
 		self.rightBtn.clicked.connect(self.textEditor.setRightAlign)
-		self.rightBtn.move(150,600)
- 
+		self.rightBtn.move(73+73,STARTPOSEDITOR[1]+10+60+60+60+60)
+		self.rightBtn.resize(40, 40)
+		self.rightBtn.setIcon(QtGui.QIcon('./images/icons/right-align.png'))
+		self.rightBtn.setIconSize(QtCore.QSize(34,34))
 
+		# Highlight button
+		self.highlightBtn = QtGui.QPushButton("HIGHLIGHT",self)
+		self.highlightBtn.clicked.connect(self.textEditor.setHighlight)
+		self.highlightBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60)
+		self.highlightBtn.resize(STARTPOSEDITOR[0]-35, 40)
+
+
+		# Add diagram button
+		self.diagramBtn = QtGui.QPushButton("ADD DIAGRAM",self)
+		self.diagramBtn.clicked.connect(self.textEditor.addDiagram)
+		self.diagramBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60+120)
+		self.diagramBtn.resize(STARTPOSEDITOR[0]-35, 60)
+
+
+		# Add graph button
+		self.graphBtn = QtGui.QPushButton("ADD GRAPH",self)
+		self.graphBtn.clicked.connect(self.textEditor.addGraph)
+		self.graphBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60+100+100)
+		self.graphBtn.resize(STARTPOSEDITOR[0]-35, 60)
 
 class Editor(QtGui.QMainWindow) :
 
