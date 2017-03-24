@@ -225,7 +225,7 @@ def draw(subjectName, choice):
 		elif k == ord('l') or k == ord('L'):
 			pass
 		elif k == ord('s') or k == ord('S') :
-			fileName = subjectName + "/" + str(random.randint(0,1000000)) + str(".jpg")
+			fileName = "AppData" + "/" + str(random.randint(0,10000000)) + str(".jpg")
 			cv2.imwrite(fileName, show)
 			break
 

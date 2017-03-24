@@ -1,8 +1,10 @@
-import sys
+import sys, MySQLdb
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtGui import QFont
 from UIconstants import *
 import opencv as opencv
+
+gSubject = None
 
 class TextEditor(QtGui.QTextEdit) :
 	# class for the main editor window
@@ -10,57 +12,68 @@ class TextEditor(QtGui.QTextEdit) :
 
 	def __init__(self, parent = None) :
 		super(TextEditor,self).__init__(parent)
-
 		font = self.font()
 		font.setPointSize(PARAFONT)
 		self.setFont(font)
 		self.setFontPointSize(PARAFONT)
 
+	# Heading format
 	def setHeadingFormat(self) :
 		self.setFontWeight(QFont.Black)
 		self.setFontPointSize(HEADFONT)
 		self.setAlignment(QtCore.Qt.AlignCenter)
 
+	# Sub Heading format
 	def setSubHeadingFormat(self) :
 		self.setFontWeight(55)
 		self.setFontPointSize(SUBHEADFONT)		
 		self.setAlignment(QtCore.Qt.AlignLeft)
 
+	# Paragraph format
 	def setParagraphFormat(self) :
 		self.setFontWeight(QFont.Normal)
 		self.setFontPointSize(PARAFONT)		
 		self.setAlignment(QtCore.Qt.AlignLeft)
 
+	# Bold format
 	def setBoldFont(self) :
 		if self.fontWeight() != QFont.Black :
 			self.setFontWeight(QFont.Black)
 		else :
 			self.setFontWeight(QFont.Normal)
 
+	# Italic format
 	def setItalicFont(self) :
 		self.setFontItalic(not self.fontItalic())
 
+	# Underline format
 	def setUnderlineFont(self) :
 		self.setFontUnderline(not self.fontUnderline())
 
+	# Left Align format
 	def setLeftAlign(self) :
 		self.setAlignment(QtCore.Qt.AlignLeft)
 
+	# Center Align format
 	def setCenterAlign(self) :
 		self.setAlignment(QtCore.Qt.AlignCenter)
 
+	# Right Align format
 	def setRightAlign(self) :
 		self.setAlignment(QtCore.Qt.AlignRight)
 
+	# Highlight format
 	def setHighlight(self) :
 		if self.textBackgroundColor() != QtGui.QColor(255,255,0) :
 			self.setTextBackgroundColor(QtGui.QColor(255,255,0))
 		else :
 			self.setTextBackgroundColor(QtGui.QColor(255,255,255))
 
+	# Add diagram code
 	def addDiagram(self) :
 
-		loc = opencv.draw("maths", 1)
+		global gSubject
+		loc = opencv.draw(gSubject, 1)
 		print(loc)
 		image = QtGui.QImage(loc, 'JPG')
 		cursor = QtGui.QTextCursor(self.document())
@@ -68,8 +81,9 @@ class TextEditor(QtGui.QTextEdit) :
 		cursor.insertImage(image, loc)
 		#cursor.insertImage(QtCore.QString(loc))
 
+	# Subroutine for adding graph api :: made by baba ;P
 	def addGraph(self) :
-		loc = opencv.draw("maths", 2)
+		loc = opencv.draw(gSubject, 2)
 		print(loc)
 		image = QtGui.QImage(loc, 'JPG')
 		cursor = QtGui.QTextCursor(self.document())
@@ -129,7 +143,6 @@ class Widget(QtGui.QWidget) :
 		self.italicBtn.setIcon(QtGui.QIcon('./images/icons/italics.png'))
 		self.italicBtn.setIconSize(QtCore.QSize(20,20))
 
-
 		# UnderLine button
 		self.underlineBtn = QtGui.QPushButton("",self)
 		self.underlineBtn.clicked.connect(self.textEditor.setUnderlineFont)
@@ -137,7 +150,6 @@ class Widget(QtGui.QWidget) :
 		self.underlineBtn.resize(40, 40)
 		self.underlineBtn.setIcon(QtGui.QIcon('./images/icons/underline.png'))
 		self.underlineBtn.setIconSize(QtCore.QSize(25,25))
-
 
 		# Left alignment :)
 		self.leftBtn = QtGui.QPushButton("",self)
@@ -169,13 +181,11 @@ class Widget(QtGui.QWidget) :
 		self.highlightBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60)
 		self.highlightBtn.resize(STARTPOSEDITOR[0]-35, 40)
 
-
 		# Add diagram button
 		self.diagramBtn = QtGui.QPushButton("ADD DIAGRAM",self)
 		self.diagramBtn.clicked.connect(self.textEditor.addDiagram)
 		self.diagramBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60+120)
 		self.diagramBtn.resize(STARTPOSEDITOR[0]-35, 60)
-
 
 		# Add graph button
 		self.graphBtn = QtGui.QPushButton("ADD GRAPH",self)
@@ -183,11 +193,22 @@ class Widget(QtGui.QWidget) :
 		self.graphBtn.move(20,STARTPOSEDITOR[1]+10+60+60+60+60+60+100+100)
 		self.graphBtn.resize(STARTPOSEDITOR[0]-35, 60)
 
+
 class Editor(QtGui.QMainWindow) :
 
-	def __init__(self) :
-		super(Editor, self).__init__()
+	gParent = None
+
+	def __init__(self, subject = None, filename = "", parent = None) :
+		super(Editor, self).__init__(parent)
+
+		global gParent, gSubject
+		
+		gParent = parent
+		gSubject = subject
+		self.filename = filename
+		self.changesSaved = False
 		self.makeUI()
+		self.openFile(filename)
 
 	def makeUI(self) :
 		self.textWidget = Widget(self)
@@ -202,3 +223,115 @@ class Editor(QtGui.QMainWindow) :
 # 	sys.exit(app.exec_())
 
 # # main()
+		self.setCentralWidget(self.textWidget)
+ 
+		#################################################################################
+		## Defining Quick access toolbar
+		## Features : Open Save Undo Redo
+		## Future development : Font, Font size, color, etc
+		#################################################################################
+
+		self.actionSave = QtGui.QAction(QtGui.QIcon("./images/icons/save.png"), "", self) 
+		self.actionSave.setShortcut("Ctrl+S")
+		self.actionSave.triggered.connect(self.performSave)
+
+		self.actionOpen = QtGui.QAction(QtGui.QIcon("./images/icons/open.png"), "", self) 
+		self.actionOpen.setShortcut("Ctrl+O")
+		self.actionOpen.triggered.connect(self.performOpen)
+
+		self.actionUndo = QtGui.QAction(QtGui.QIcon("./images/icons/undo.ico"), "", self) 
+		self.actionUndo.setShortcut("Ctrl+Z")
+		self.actionUndo.triggered.connect(self.performUndo)
+
+		self.actionRedo = QtGui.QAction(QtGui.QIcon("./images/icons/redo.png"), "", self) 
+		self.actionRedo.setShortcut("Ctrl+Y")
+		self.actionRedo.triggered.connect(self.performRedo)
+
+		self.toolbar = self.addToolBar("QuickAccessToolbar")
+		self.toolbar.addAction(self.actionOpen)
+		self.toolbar.addAction(self.actionSave)
+		self.toolbar.addAction(self.actionUndo)
+		self.toolbar.addAction(self.actionRedo)
+
+	def changed(self) :
+		self.changesSaved = False
+
+	def closeEvent(self,event):
+		if self.changesSaved:
+			event.accept()
+		else:
+			confirmExitWindow = QtGui.QMessageBox(self)
+			confirmExitWindow.setIcon(QtGui.QMessageBox.Warning)
+			confirmExitWindow.setText("Changes occured!!!")
+
+			confirmExitWindow.setInformativeText("Do you want to save your changes?")
+			confirmExitWindow.setStandardButtons(QtGui.QMessageBox.Save | QtGui.QMessageBox.Cancel | QtGui.QMessageBox.Discard)
+			confirmExitWindow.setDefaultButton(QtGui.QMessageBox.Save)
+
+			answer = confirmExitWindow.exec_()
+
+			if answer == QtGui.QMessageBox.Save:
+				self.performSave()
+			elif answer == QtGui.QMessageBox.Discard:
+				event.accept()
+			else:
+				event.ignore()
+
+
+	def openFile(self,filename) :
+		with open(self.filename,"rt") as file:
+			self.textWidget.textEditor.setText(file.read())
+
+	def performSave(self):
+
+		global gSubject
+
+		if not self.filename:
+			self.filename = QtGui.QFileDialog.getSaveFileName(self, 'Save File')
+
+		if self.filename:
+		    # Append extension if not there yet
+			if not str(self.filename).endswith(".html"):
+				self.filename += ".html"
+
+			with open(self.filename,"wt") as file:
+				file.write(self.textWidget.textEditor.toHtml())
+
+			self.changesSaved = True
+
+			db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+			connection = db.cursor()
+			temp = connection.execute("SELECT fname,subject FROM NOTES WHERE fpath=%s and Subject=%s;",(str(self.filename),str(gSubject)))
+			results = connection.fetchall()
+			if len(results) == 0:
+
+				fname = (self.filename.split('.')[0]).split('/')[-1]
+				print(str(self.filename), str(fname), str(gSubject))
+				connection.execute("INSERT INTO NOTES VALUES(%s, %s, %s);",(str(self.filename), str(fname), str(gSubject)))
+				db.commit()
+
+			print('Here')
+			db.close()
+
+
+	def performOpen(self) :
+		self.filename = QtGui.QFileDialog.getOpenFileName(self, 'Open File',".","(*.html)")
+
+		if self.filename:
+			with open(self.filename,"rt") as file:
+				self.textWidget.textEditor.setText(file.read())
+
+	def performUndo(self) :
+		self.textWidget.textEditor.undo()		
+
+	def performRedo(self) :
+		self.textWidget.textEditor.redo()		
+
+
+##############################################
+
+# def main() :
+# 	# app = QtGui.QApplication(sys.argv)
+# 	editorWindow = Editor("maths")
+# 	editorWindow.show()
+# 	# sys.exit(app.exec_())

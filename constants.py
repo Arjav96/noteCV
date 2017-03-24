@@ -10,10 +10,16 @@ except AttributeError:
     def _fromUtf8(s):
         return s
 
+<<<<<<< HEAD
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig, _encoding)
+=======
+HEADFONT	=		30
+SUBHEADFONT	=		20
+PARAFONT	=		15
+>>>>>>> OpenCV
 
 except AttributeError:
     def _translate(context, text, disambig):

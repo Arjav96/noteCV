@@ -242,7 +242,7 @@ class NoteWidget(QtGui.QWidget):
 			button = QtGui.QPushButton("",self)
 			buttons.append(button)
 			buttonToAddress[button] = (result[0],result[1])
-			button.clicked.connect(lambda: self.openEditor())
+			button.clicked.connect(lambda: self.openEditor(subject))
 
 
 		alltopics = buttons
@@ -281,15 +281,18 @@ class NoteWidget(QtGui.QWidget):
 	# Launching the editor application
 	def addNote(self,subject):
 		
-#		editorWindow = Main.Editor(subject)
-		editorWindow = Main.Editor()
+		editorWindow = Main.Editor(subject)
+#		editorWindow = Main.Editor()
 		editorWindow.exec_()
 
 	# Launching Editor Application for existing files
-	def openEditor(self):
+	def openEditor(self, subject):
 
 		senderBtn = self.sender()
-		print (buttonToAddress[senderBtn][0])
+		# print (buttonToAddress[senderBtn][0])
+		newEditor = Main.Editor(subject, buttonToAddress[senderBtn][1])
+		newEditor.exec_()
+
 
 #######################################################################################################
 
