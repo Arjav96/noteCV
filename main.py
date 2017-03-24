@@ -36,6 +36,7 @@ def createDatabase():
 
 subjectArray = []
 alltopics = []
+allLabels = []
 
 #########################################################################################################
 
@@ -105,6 +106,7 @@ class Window(QtGui.QWidget):
 		# Password Input Field
 
 		self.passwdInp = QtGui.QLineEdit(self)
+		self.passwdInp.setEchoMode(QtGui.QLineEdit.Password)
 		self.passwdInp.move(675,370)
 		self.passwdInp.resize(400,50)
 		self.passwdInp.setFont(font2)
@@ -154,7 +156,8 @@ class MainWindow(QtGui.QMainWindow):
 	def startUI(self):
 
 		self.LoginWidget = Dashboard('Himanshu',self)
-		self.setStyleSheet('background-color:;')
+	#	self.LoginWidget = Window(self)
+		self.setStyleSheet('background-color:white;')
 		self.move(0,0)
 		self.resize(WIDTH,HEIGHT)
 		self.setCentralWidget(self.LoginWidget)
@@ -172,7 +175,7 @@ class SubjectWidget(QtGui.QWidget):
 
 	def startUI(self,ls,parent):
 
-		self.setGeometry(10,170,200,500)
+		self.setGeometry(30,190,200,500)
 		self.layout = QtGui.QVBoxLayout()
 		self.show()
 
@@ -208,7 +211,7 @@ class NoteWidget(QtGui.QWidget):
 
 	def buildUI(self, subject):
 
-		self.setGeometry(220,170,WIDTH-220,HEIGHT-170)
+		self.setGeometry(240,190,WIDTH-220,HEIGHT-190)
 		self.show()
 
 		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
@@ -221,47 +224,72 @@ class NoteWidget(QtGui.QWidget):
 		fnames = []
 		fpaths = []
 
-		global alltopics
+		global alltopics, allLabels
 
 		if len(alltopics) > 0:
 			for i in alltopics:
 				i.setParent(None)
 
+		if len(allLabels) > 0:
+			for i in allLabels:
+				i.setParent(None)
+			allLabels = []
+
 		for result in results:
 
 			fnames.append(result[0])
 			fpaths.append(result[1])
-			buttons.append(QtGui.QPushButton(result[0],self))
+			button = QtGui.QPushButton("",self)
+			buttons.append(button)
+			buttonToAddress[button] = (result[0],result[1])
+			button.clicked.connect(lambda: self.openEditor())
+
 
 		alltopics = buttons
 
-		x = 10
-		y = 20
+		x = 60
+		y = 40
+		i = 0
 		for button in buttons:
-			button.resize(60,60)
+			button.resize(50,64)
 			button.move(x,y)
+			button.setStyleSheet('border:None;background-image:url("./images/icons/icon1.png");')
+			self.label = QtGui.QLabel(fnames[i],self)
+			allLabels.append(self.label)
+			self.label.move(x,y+70)
+			self.label.resize(100,50)
+			self.label.setWordWrap(True)
+			self.label.setFont(fontSmall)
+			self.label.show() # Remove previous
 			button.show()
-			x += 80
+			x += 120
 			if x >= 1250:
-				y += 80
-				x = 10
+				y += 140
+				x = 60
+			i += 1
 
 		# The button to add new note
-		self.addNewNoteBtn = QtGui.QPushButton('Add New Note', self)
-		self.addNewNoteBtn.move(300,300)
-		self.addNewNoteBtn.resize(200,200)
+		self.addNewNoteBtn = QtGui.QPushButton('', self)
+		self.addNewNoteBtn.move(x,y)
+		self.addNewNoteBtn.resize(70,70)
 		self.addNewNoteBtn.setFont(font1)
 		self.addNewNoteBtn.clicked.connect(lambda: self.addNote(subject))
-		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
+		self.addNewNoteBtn.setStyleSheet('border:None;background-image:url("./images/icons/icon2.png");')
 		self.addNewNoteBtn.show()
-
-
+		alltopics.append(self.addNewNoteBtn)
 
 	# Launching the editor application
 	def addNote(self,subject):
 		
-		editorWindow = Main.Editor(subject)
+#		editorWindow = Main.Editor(subject)
+		editorWindow = Main.Editor()
 		editorWindow.exec_()
+
+	# Launching Editor Application for existing files
+	def openEditor(self):
+
+		senderBtn = self.sender()
+		print (buttonToAddress[senderBtn][0])
 
 #######################################################################################################
 
@@ -282,34 +310,33 @@ class Dashboard(QtGui.QWidget):
 
 		# Header Message Display
 		self.headerMessage = QtGui.QLabel('NoteCV',self)
-		self.headerMessage.move(400,10)
-		self.headerMessage.resize(650,50)
+		self.headerMessage.move(500,30)
+		self.headerMessage.resize(450,50)
 		self.headerMessage.setFont(fontCSL)
-		self.headerMessage.setStyleSheet('color:black;border:3px SOLID black;padding-left:250px;')
+		self.headerMessage.setStyleSheet('color:black;border:3px SOLID black;padding-left:150px;')
 
 		#username
 
 		self.userNameLabel = QtGui.QLabel('Hello '+username+'!',self)
-		self.userNameLabel.move(100,40)
+		self.userNameLabel.move(70,40)
 		self.userNameLabel.resize(400,50)
 		self.userNameLabel.setFont(font1)
 
 		self.subjectCount = self.displaySubjects()
 
 		self.addNewBtn = QtGui.QPushButton('Add New Subject',self)
-		self.addNewBtn.move(10,100)
+		self.addNewBtn.move(40,120)
 		self.addNewBtn.setStyleSheet('width:200;height:50;background-color:black;color:white;')
 		self.addNewBtn.clicked.connect(lambda: self.addNewSubject())
 		self.addNewBtn.setFont(font1)
 
 		self.searchBar = QtGui.QLineEdit(self)
 		self.searchBar.setStyleSheet('width:600;height:30;border:2px SOLID black;')
-	#	self.searchBar.resize(500,50)
-		self.searchBar.move(250,100)
+		self.searchBar.move(300,140)
 
 		self.searchBtn = QtGui.QPushButton('Search',self)
-		self.searchBtn.move(870,100)
-		self.searchBtn.setStyleSheet('width:200;height:30;border:2px SOLID black;')
+		self.searchBtn.move(910,137)
+		self.searchBtn.setStyleSheet('width:200;height:30;background-color: black;color:white')
 		self.searchBtn.setFont(font1)
 
 

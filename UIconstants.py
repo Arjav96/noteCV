@@ -34,6 +34,7 @@ PARAFONT	=		15
 
 STARTPOSEDITOR	=	(200,100)
 
+# Fonts
 
 font1 = QtGui.QFont()
 font1.setFamily(_fromUtf8("Sawasdee"))
@@ -47,3 +48,13 @@ fontCSL.setFamily(_fromUtf8("Courier 10 Pitch"))
 fontCSL.setPointSize(22)
 fontCSL.setBold(True)
 fontCSL.setWeight(75)
+
+fontSmall = QtGui.QFont()
+fontSmall.setFamily(_fromUtf8("Sawasdee"))
+fontSmall.setPointSize(12)
+fontSmall.setBold(True)
+fontSmall.setWeight(75)
+
+# Dictionary
+
+buttonToAddress = {}

@@ -193,7 +193,6 @@ class Editor(QtGui.QMainWindow) :
 		self.textWidget = Widget(self)
 		self.move(0,0)
 		self.resize(WIDTH, HEIGHT)
-		print("Hello")
 		self.setCentralWidget(self.textWidget)	
 		self.show()
 
