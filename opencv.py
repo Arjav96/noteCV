@@ -35,22 +35,53 @@ WIDTH					=	640
 HEIGHT					=	480
 COLOR 					=	(0, 0, 0)
 prevx, prevy 			= 	-1, -1 			#Storing previous cooordinates
+drawit					=	False
+cursorx, cursory		=	-1, -1
+coorX					=	[]
+coorY					=	[]
+show 					= 	np.ndarray((HEIGHT, WIDTH, 3))
+Isgraph					=	False
 
 
-def draw():
+
+'''def mouseEvent(event, x, y, flags, param):
+	global show, Isgraph
+	if event == cv2.EVENT_LBUTTONDOWN:
+		if 30 <= x <= 230 and 20 <= y <= 90:
+			print "hello"
+			show = cv2.imread("graph.jpg")
+			Isgraph = True
+			#cv2.imshow('graph', show)
+'''
+
+
+def draw(choice):
 	cap = cv2.VideoCapture(0)
 
 	cap.set(3, WIDTH)
 	cap.set(4, HEIGHT)
 	#print cap.get(4),cap.get(3)
 
-	show = np.ndarray((int(cap.get(4)), int(cap.get(3)), 3))
-	show.fill(255)
+	
+	display = np.ndarray((int(cap.get(4)) + 100, int(cap.get(3)), 3))
+	
+	if choice == 1:				#Make diagram
+		show.fill(255)
+	if choice == 2:
+		show = cv2.imread("graph.jpg")	#Make graph
+	#display.fill(255)
 
-	global COLOR, prevx, prevy
+	global COLOR, prevx, prevy, drawit, cursorx, cursory, show
+
+	
+	cv2.namedWindow("noteCV")
+	#cv2.setMouseCallback("noteCV", mouseEvent)
 
 
 	while True:
+
+		
+
 		ret, img = cap.read()
 		img = cv2.flip(img, 1)
 
@@ -89,7 +120,7 @@ def draw():
 
 		#cv2.rectangle(show,(0,0),(int(cap.get(3)), int(cap.get(4))), WHITE, -1)
 
-		
+		flag = False
 
 		for contour in contours:
 			# get rectangle bounding contour
@@ -105,36 +136,95 @@ def draw():
 				continue
 #######################################################################################
 
-			print "current points: ", (x, y)
+			#print "current points: ", (x, y)
 
-			if prevx == -1:
-				cv2.circle(show, (x, y), 1, COLOR, -1)
-			else:
-				cv2.line(show, (x, y), (prevx, prevy), COLOR, 1)
+			if cursorx != -1:
+				#cv2.circle(show, (cursorx, cursory), 2, WHITE, -1)
+				for i in range(max(0,cursorx-2),min(WIDTH, cursorx+3)):
+					for j in range(max(0, cursory-2),min(HEIGHT, cursory+3)) :
+						show[j][i] = tmp[j][i]
+			#print "(cursorx, cursory)", (cursorx, cursory)
 
-			print "previous points: ", (prevx, prevy)
+			# (cx-2, cy-2) -> (cx+2, cy+2)
+
+			tmp = np.ndarray((HEIGHT, WIDTH,3))
+			tmp.fill(255)
+			for i in range(max(x-2,0),min(x+3,WIDTH)):
+				for j in range(max(0,y-2), min(y+3,HEIGHT)) :
+					tmp[j][i] = show[j][i]
+
+			#print "(x, y)",(x, y)
+
+
+
+			cv2.circle(show, (x, y), 2, NAVYBLUE, -1)
+			#cv2.rectangle(show, (x, y), (x+2, y+2), NAVYBLUE, -1)
+
+
+			
+			cursorx = x
+			cursory = y
+
+			if drawit:
+				if prevx == -1:
+					cv2.circle(show, (x, y), 3, COLOR, -1)
+				else:
+					cv2.line(show, (x, y), (prevx, prevy), COLOR, 3)
+
+			#print "previous points: ", (prevx, prevy)
 			prevx = x
 			prevy = y
 
-			
-			
+		if choice == 1:	
+			'''
+			for i in range(100):
+				display[i,:] = OLIVE
 
-		cv2.imshow('noteCV', show)
+			#print display[99,:]
+
+			for i in range(HEIGHT):
+				display[100+i,:] = show[i,:]
+
+			print display[100,:], show[0,:] 
+			
+			cv2.rectangle(display, (30,20), (200,70),FUCHSIA, 0)
+			cv2.putText(display, "MAKE GRAPH", (50, 50), font, 0.7, (0,0,0), 2, cv2.CV_AA)
+			'''
+			cv2.imshow('noteCV', show)
+
+		else:
+			'''
+			for i in range(100):
+				display[i,:] = OLIVE
+
+			#print display[99,:]
+
+			for i in range(HEIGHT):
+				display[100+i,:] = show[i,:]
+
+			#print display[100,:] 
+			
+			cv2.rectangle(display, (30,20), (200,70),FUCHSIA, 0)
+			cv2.putText(display, "MAKE DIAGRAM", (50, 50), font, 0.7, (0,0,0), 2, cv2.CV_AA)
+			'''
+			cv2.imshow('noteCV', show)
 
 		k = cv2.waitKey(1) & 0xFF
 		if k == ord('q') :
 			break
 		elif k == ord('x') or k == ord('X'):
-			COLOR = (255, 255, 255)
+			drawit = not drawit
 		elif k == ord('g') or k == ord('G') :
 			COLOR = (0, 255, 0)
 		elif k == ord('r') or k == ord('R') :
 			COLOR = (0, 0, 255)
 		elif k == ord('b') or k == ord('B') :
 			COLOR = (255, 0, 0)
+		elif k == ord('l') or k == ord('L'):
+			pass
 		
 	cv2.destroyAllWindows()
 	cap.release()
 
 
-draw()
+#draw(2)
