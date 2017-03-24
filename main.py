@@ -196,8 +196,8 @@ class NoteWidget(QtGui.QWidget):
 
 	def buildUI(self, subject):
 
-		self.vertLayout = QtGui.QVBoxLayout()
-		self.vertLayout.stretch(2)
+		self.vertLayout = QtGui.QGridLayout()
+	#	self.vertLayout.stretch(2)
 		self.setGeometry(220,170,WIDTH-220,HEIGHT-170)
 		self.show()
 	#	self.setStyleSheet('border: 2px SOLID black;')
@@ -212,8 +212,16 @@ class NoteWidget(QtGui.QWidget):
 		self.addNewNoteBtn.clicked.connect(self.addNote)
 		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
 
-		#for i in xrange()
-		self.vertLayout.addWidget(self.addNewNoteBtn)
+		for i in xrange(0,5):
+			self.vertLayout.setRowMinimumHeight(i,100)
+			for j in xrange(0,10):
+				# self.vertLayout.setColumnMinimumWidth(j,100)
+				self.vertLayout.addWidget(QPushButton('btn',self), i, j, 10, 10)
+
+		self.vertLayout.setColumnMinimumWidth(3,200)
+#		self.vertLayout.setColumnStretch(4,5)
+
+#		self.vertLayout.addWidget(self.addNewNoteBtn)
 
 	def addNote(self):
 		return
