@@ -35,6 +35,8 @@ def insertIntoDB():
 	db.commit()
 	db.close()
 
+subjectArray = []
+
 
 class Window(QtGui.QWidget):
 
@@ -157,58 +159,79 @@ class SubjectWidget(QtGui.QWidget):
 	def __init__(self, ls, parent=None):
 
 		super(SubjectWidget, self).__init__(parent)
-		self.startUI(ls)
+		self.startUI(ls,parent)
 
-	def startUI(self,ls):
+	def startUI(self,ls,parent):
 
 		self.setGeometry(10,170,200,500)
 		self.layout = QtGui.QVBoxLayout()
 		self.show()
 
-		# self.listBox = QVBoxLayout(self)
-		# self.setLayout(self.listBox)
-		# self.scroll = QScrollArea(self)
-		# self.listBox.addWidget(self.scroll)
-		# self.scroll.setWidgetResizable(True)
-		# self.scrollContent = QWidget(self.scroll)
-
-		# self.scrollLayout = QVBoxLayout(self.scrollContent)
-		# self.scrollContent.setLayout(self.scrollLayout)
-		# self.scroll.setWidget(self.scrollContent)
+		buttons = []
+		for subject in ls:
+			buttons.append(QtGui.QPushButton(subject,self))
 
 		x = 0
-		for subject in ls:
-			self.subLabel = QtGui.QLabel(subject,self)
-			self.subLabel.resize(180,50)
-			self.subLabel.move(10,x*60)
-			self.subLabel.setStyleSheet('color: white; border: 2px SOLID black; border-radius:5px;')
-			self.layout.addWidget(self.subLabel)
+		for btn in buttons:
+			btn.resize(180,60)
+			btn.move(10,x*60)
+			btn.setStyleSheet('height: 50px;color: white; border: 2px SOLID black; border-radius:5px;')
+			self.layout.addWidget(btn)
+			btn.clicked.connect(lambda: self.showNotes(btn,parent))
 			x += 1
 
 		self.setLayout(self.layout)
+
+	def showNotes(self, subject, parent):
+		senderBtn = self.sender()
+		noteWidget = NoteWidget(senderBtn.text(),parent)
+
+
+class NoteWidget(QtGui.QWidget):
+
+	def __init__(self,subject,parent=None):
+
+		super(NoteWidget, self).__init__(parent)
+		self.buildUI(subject)
+
+	def buildUI(self, subject):
+
+		self.vertLayout = QtGui.QVBoxLayout()
+		self.vertLayout.stretch(2)
+		self.setGeometry(220,170,WIDTH-220,HEIGHT-170)
+		self.show()
+	#	self.setStyleSheet('border: 2px SOLID black;')
+		print(subject)
+		self.setLayout(self.vertLayout)
+
+		# The button to add new note
+		self.addNewNoteBtn = QtGui.QPushButton('Add New Note', self)
+		self.addNewNoteBtn.move(300,300)
+		self.addNewNoteBtn.resize(200,200)
+		self.addNewNoteBtn.setFont(font1)
+		self.addNewNoteBtn.clicked.connect(self.addNote)
+		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
+
+		#for i in xrange()
+		self.vertLayout.addWidget(self.addNewNoteBtn)
+
+	def addNote(self):
+		return
 
 
 class Dashboard(QtGui.QWidget):
 
 	subjectCount = 0
-
-	font1 = QtGui.QFont()
-	font1.setFamily(_fromUtf8("Sawasdee"))
-	font1.setPointSize(16)
-	font1.setBold(True)
-	font1.setWeight(75)
+	global subjectArray
 
 	def __init__(self,username,parent=None):
 
 		super(Dashboard, self).__init__(parent)
 		self.startUI(username)
-		print(username)
 
 	def startUI(self,username):
 		self.setGeometry(10,10,400,400)
 		self.setWindowTitle('Dashboard')
-
-	#	self.dashBoardLayout = QtGui.QGridLayout()
 
 		headerFont = QtGui.QFont()
 		headerFont.setFamily(_fromUtf8("Sawasdee"))
@@ -222,16 +245,12 @@ class Dashboard(QtGui.QWidget):
 		self.headerMessage.resize(650,50)
 		self.headerMessage.setFont(headerFont)
 
-	#	self.dashBoardLayout.addWidget(self.headerMessage)
-
 		#username
 
 		self.userNameLabel = QtGui.QLabel('Hello '+username+'!',self)
 		self.userNameLabel.move(100,40)
 		self.userNameLabel.resize(400,50)
-		self.userNameLabel.setFont(self.font1)
-
-	#	self.dashBoardLayout.addWidget(self.userNameLabel)
+		self.userNameLabel.setFont(font1)
 
 		self.subjectCount = self.displaySubjects()
 
@@ -240,17 +259,6 @@ class Dashboard(QtGui.QWidget):
 		self.addNewBtn.resize(200,50)
 		self.addNewBtn.clicked.connect(lambda: self.addNewSubject())
 
-		# The button to add new note
-		self.addNewNoteBtn = QtGui.QPushButton('Add New Note', self)
-		self.addNewNoteBtn.move(500,400)
-		self.addNewNoteBtn.resize(200,200)
-		self.addNewNoteBtn.setFont(self.font1)
-		self.addNewNoteBtn.clicked.connect(self.addNote)
-		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
-
-	#	self.dashBoardLayout.addWidget(self.addNewBtn)
-	#	self.setLayout(self.dashBoardLayout)
-
 
 	def displaySubjects(self):
 
@@ -258,26 +266,30 @@ class Dashboard(QtGui.QWidget):
 		connection = db.cursor()
 		temp = connection.execute("SELECT * FROM subjects")
 		result = connection.fetchall()
+		db.close()
 
 		x = 0
 		ls = []
 		for subject in result:
 			ls.append(subject[0])
-			# self.subLabel = QtGui.QLabel(subject[0],self)
-			# self.subLabel.resize(200,50)
-			# self.subLabel.move(10,170+x*60)
-			
-			# x += 1
 
-		db.close()
+		if len(subjectArray) > 0:
+			subjectArray[0].setParent(None)
+#			subjectArray[1].setParent(None)
+#			subjectArray.pop(1)
+			subjectArray.pop(0)
+
+	#	self.scroll = QtGui.QScrollArea(self)
+	#	self.scroll.setWidgetResizable(True)
 
 		self.subjectWidget = SubjectWidget(ls,self)
 		self.subjectWidget.setStyleSheet('background-color: red')
+		subjectArray.append(self.subjectWidget)
 
-		# self.scrollBar = QtGui.QScrollArea(self)
-		# self.scrollBar.setWidgetResizable(True)
-
-
+	#	self.scrollwidget = self.subjectWidget
+#		subjectArray.append(self.scrollwidget)
+	#	self.scrollwidget.setGeometry(QtCore.QRect(10,200,200,400))
+	#	self.scroll.setWidget(self.scrollwidget)
 
 		print(len(result))
 		return len(result)
@@ -286,7 +298,7 @@ class Dashboard(QtGui.QWidget):
 
 		newSubject, ret = QtGui.QInputDialog.getText(self, 'Input', 'Enter New Subject Name')
 
-		if newSubject == "":
+		if newSubject == '' or newSubject == ' ':
 			return
 
 		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
@@ -297,10 +309,6 @@ class Dashboard(QtGui.QWidget):
 		QtGui.QApplication.processEvents()
 		self.update()
 		self.displaySubjects()
-
-
-	def addNote(self):
-		return
 
 
 
