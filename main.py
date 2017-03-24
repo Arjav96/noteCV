@@ -155,8 +155,8 @@ class MainWindow(QtGui.QMainWindow):
 
 	def startUI(self):
 
-		self.LoginWidget = Dashboard('Himanshu',self)
-	#	self.LoginWidget = Window(self)
+		# self.LoginWidget = Dashboard('Himanshu',self)
+		self.LoginWidget = Window(self)
 		self.setStyleSheet('background-color:white;')
 		self.move(0,0)
 		self.resize(WIDTH,HEIGHT)
