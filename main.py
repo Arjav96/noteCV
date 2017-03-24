@@ -5,6 +5,10 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 import Main as Main
 
+#####################################################################################################
+
+# Adding fromUtf8
+
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
@@ -20,7 +24,9 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+#######################################################################################################
 
+# Global method to create database
 def createDatabase():
 
 	db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
@@ -28,17 +34,12 @@ def createDatabase():
 	connection.execute("CREATE TABLE USERS(USERNAME VARCHAR(30) NOT NULL PRIMARY KEY, PASSWORD VARCHAR(30));")
 	db.close()
 
-def insertIntoDB():
-
-	db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
-	connection = db.cursor()
-	connection.execute("INSERT INTO USERS(USERNAME, PASSWORD) VALUES(?,?)",("Himanshu", "Pt"))
-	db.commit()
-	db.close()
-
 subjectArray = []
+alltopics = []
 
+#########################################################################################################
 
+# Class that defines the Main Login Window
 class Window(QtGui.QWidget):
 
 	status = False
@@ -116,7 +117,7 @@ class Window(QtGui.QWidget):
 		self.loginBtn.resize(200,50)
 		self.loginBtn.clicked.connect( lambda: self.verifyLogin(self.unameInp, self.passwdInp, parent))
 		
-
+	# A method that verifies Login details
 	def verifyLogin(self, unameInp, passwdInp, parent):
 
 
@@ -140,7 +141,9 @@ class Window(QtGui.QWidget):
 			messageBox.exec_()
 			self.status = False
 	
+##################################################################################################################
 
+# Class that defines Main Window of the Application
 class MainWindow(QtGui.QMainWindow):
 
 	def __init__(self):
@@ -151,10 +154,15 @@ class MainWindow(QtGui.QMainWindow):
 	def startUI(self):
 
 		self.LoginWidget = Dashboard('Himanshu',self)
+		self.setStyleSheet('background-color:;')
 		self.move(0,0)
 		self.resize(WIDTH,HEIGHT)
 		self.setCentralWidget(self.LoginWidget)
 
+
+##########################################################################################################
+
+# A Class that inherits QWidgets and defines the side-bar holding various Subjects
 class SubjectWidget(QtGui.QWidget):
 
 	def __init__(self, ls, parent=None):
@@ -176,18 +184,21 @@ class SubjectWidget(QtGui.QWidget):
 		for btn in buttons:
 			btn.resize(180,60)
 			btn.move(10,x*60)
-			btn.setStyleSheet('height: 50px;color: white; border: 2px SOLID black; border-radius:5px;')
+			btn.setStyleSheet('height: 50px; border: 2px SOLID black;')
 			self.layout.addWidget(btn)
 			btn.clicked.connect(lambda: self.showNotes(btn,parent))
 			x += 1
 
 		self.setLayout(self.layout)
 
+	# The onclick listener which triggers the display of previous notes of a subject
 	def showNotes(self, subject, parent):
 		senderBtn = self.sender()
 		noteWidget = NoteWidget(senderBtn.text(),parent)
 
+#######################################################################################################
 
+# The class that defnes the widget for display of previous notes
 class NoteWidget(QtGui.QWidget):
 
 	def __init__(self,subject,parent=None):
@@ -197,40 +208,64 @@ class NoteWidget(QtGui.QWidget):
 
 	def buildUI(self, subject):
 
-		self.vertLayout = QtGui.QVBoxLayout()
-		self.vertLayout.stretch(2)
 		self.setGeometry(220,170,WIDTH-220,HEIGHT-170)
 		self.show()
-	#	self.setStyleSheet('border: 2px SOLID black;')
-		print(subject)
-		self.setLayout(self.vertLayout)
+
+		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+		connection = db.cursor()
+		temp = connection.execute("SELECT fname,fpath FROM NOTES WHERE Subject=%s;",(subject))
+		results = connection.fetchall()
+		db.close()
+
+		buttons = []
+		fnames = []
+		fpaths = []
+
+		global alltopics
+
+		if len(alltopics) > 0:
+			for i in alltopics:
+				i.setParent(None)
+
+		for result in results:
+
+			fnames.append(result[0])
+			fpaths.append(result[1])
+			buttons.append(QtGui.QPushButton(result[0],self))
+
+		alltopics = buttons
+
+		x = 10
+		y = 20
+		for button in buttons:
+			button.resize(60,60)
+			button.move(x,y)
+			button.show()
+			x += 80
+			if x >= 1250:
+				y += 80
+				x = 10
 
 		# The button to add new note
 		self.addNewNoteBtn = QtGui.QPushButton('Add New Note', self)
 		self.addNewNoteBtn.move(300,300)
 		self.addNewNoteBtn.resize(200,200)
 		self.addNewNoteBtn.setFont(font1)
-		self.addNewNoteBtn.clicked.connect(self.addNote)
+		self.addNewNoteBtn.clicked.connect(lambda: self.addNote(subject))
 		self.addNewNoteBtn.setStyleSheet('border: 1px SOLID black ; border-radius: 100px;')
+		self.addNewNoteBtn.show()
 
-		# for i in xrange(0,5):
-		# 	self.vertLayout.setRowMinimumHeight(i,100)
-		# 	for j in xrange(0,10):
-		# 		# self.vertLayout.setColumnMinimumWidth(j,100)
-		# 		self.vertLayout.addWidget(QPushButton('btn',self), i, j, 10, 10)
 
-	#	self.vertLayout.setColumnMinimumWidth(3,200)
-#		self.vertLayout.setColumnStretch(4,5)
 
-		self.vertLayout.addWidget(self.addNewNoteBtn)
-
-	def addNote(self):
+	# Launching the editor application
+	def addNote(self,subject):
 		
-		editorWindow = Main.Editor()
+		editorWindow = Main.Editor(subject)
 		editorWindow.exec_()
 
+#######################################################################################################
 
-
+# The Home page of a user after logging-in
 class Dashboard(QtGui.QWidget):
 
 	subjectCount = 0
@@ -242,20 +277,15 @@ class Dashboard(QtGui.QWidget):
 		self.startUI(username)
 
 	def startUI(self,username):
-		self.setGeometry(10,10,400,400)
+		self.setGeometry(0,0,WIDTH,HEIGHT)
 		self.setWindowTitle('Dashboard')
-
-		headerFont = QtGui.QFont()
-		headerFont.setFamily(_fromUtf8("Sawasdee"))
-		headerFont.setPointSize(20)
-		headerFont.setBold(True)
-		headerFont.setWeight(75)
 
 		# Header Message Display
 		self.headerMessage = QtGui.QLabel('NoteCV',self)
-		self.headerMessage.move(500,10)
+		self.headerMessage.move(400,10)
 		self.headerMessage.resize(650,50)
-		self.headerMessage.setFont(headerFont)
+		self.headerMessage.setFont(fontCSL)
+		self.headerMessage.setStyleSheet('color:black;border:3px SOLID black;padding-left:250px;')
 
 		#username
 
@@ -268,15 +298,27 @@ class Dashboard(QtGui.QWidget):
 
 		self.addNewBtn = QtGui.QPushButton('Add New Subject',self)
 		self.addNewBtn.move(10,100)
-		self.addNewBtn.resize(200,50)
+		self.addNewBtn.setStyleSheet('width:200;height:50;background-color:black;color:white;')
 		self.addNewBtn.clicked.connect(lambda: self.addNewSubject())
+		self.addNewBtn.setFont(font1)
+
+		self.searchBar = QtGui.QLineEdit(self)
+		self.searchBar.setStyleSheet('width:600;height:30;border:2px SOLID black;')
+	#	self.searchBar.resize(500,50)
+		self.searchBar.move(250,100)
+
+		self.searchBtn = QtGui.QPushButton('Search',self)
+		self.searchBtn.move(870,100)
+		self.searchBtn.setStyleSheet('width:200;height:30;border:2px SOLID black;')
+		self.searchBtn.setFont(font1)
 
 
+	# A method that displays currently added subjects
 	def displaySubjects(self):
 
 		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
 		connection = db.cursor()
-		temp = connection.execute("SELECT * FROM subjects")
+		temp = connection.execute("SELECT * FROM subjects;")
 		result = connection.fetchall()
 		db.close()
 
@@ -287,25 +329,14 @@ class Dashboard(QtGui.QWidget):
 
 		if len(subjectArray) > 0:
 			subjectArray[0].setParent(None)
-#			subjectArray[1].setParent(None)
-#			subjectArray.pop(1)
 			subjectArray.pop(0)
 
-	#	self.scroll = QtGui.QScrollArea(self)
-	#	self.scroll.setWidgetResizable(True)
-
 		self.subjectWidget = SubjectWidget(ls,self)
-		self.subjectWidget.setStyleSheet('background-color: red')
 		subjectArray.append(self.subjectWidget)
 
-	#	self.scrollwidget = self.subjectWidget
-#		subjectArray.append(self.scrollwidget)
-	#	self.scrollwidget.setGeometry(QtCore.QRect(10,200,200,400))
-	#	self.scroll.setWidget(self.scrollwidget)
-
-		print(len(result))
 		return len(result)
 		
+	# A method that adds a new Subject to the Database
 	def addNewSubject(self):
 
 		newSubject, ret = QtGui.QInputDialog.getText(self, 'Input', 'Enter New Subject Name')
@@ -322,8 +353,9 @@ class Dashboard(QtGui.QWidget):
 		self.update()
 		self.displaySubjects()
 
+###########################################################################################################
 
-
+# The main function
 def main():
 
 	mainApplication = QtGui.QApplication(sys.argv)

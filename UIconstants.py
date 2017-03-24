@@ -40,3 +40,10 @@ font1.setFamily(_fromUtf8("Sawasdee"))
 font1.setPointSize(16)
 font1.setBold(True)
 font1.setWeight(75)
+
+
+fontCSL = QtGui.QFont()
+fontCSL.setFamily(_fromUtf8("Courier 10 Pitch"))
+fontCSL.setPointSize(22)
+fontCSL.setBold(True)
+fontCSL.setWeight(75)
