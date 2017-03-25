@@ -16,6 +16,7 @@ noteCV is a smart note taking application made in python to help students all ac
 2. Run python startup.py from the repo's directory to check and install necessary python-modules including cv2 (version 2.X preferred), MySQLdb, PyQt4, numpy.
 3. Clone this repository: git clone https://github.com/Arjav96/noteCV.git or click Download ZIP in right panel and extract it.
 4. Run python run.py from the repo's directory.
+5. Read the OpenCV operating controls instructions.
 
 ## Tentative features :
 1. Login/Signup window for students
