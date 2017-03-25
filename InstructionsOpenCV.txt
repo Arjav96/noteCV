@@ -1,0 +1,9 @@
+Following are the instructions to use GREEN-CAP to draw diagrams and graphs:
+
+1. Cursor is denoted by pin-point NAVYBLUE circle dot.
+2. Press 'x' to start or pause drawing in between.
+3. Press 'g' to start drawing with green color.
+4. Press 'r' to start drawing with red color.
+5. Press 'b' to start drawing with blue color.
+6. Press 's' to save and paste on editor window.
+7. Press 'q' to quit drawing. 
