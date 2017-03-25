@@ -26,13 +26,25 @@ except AttributeError:
 
 #######################################################################################################
 
+dbPassword = None
 # Global method to create database
-def createDatabase():
+def createDatabase(passwd):
 
-	db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+#	data_base = '"Mydb2"'
+	username = 'root'
+	password = passwd
+
+	db = MySQLdb.connect(host='localhost',user='root', passwd=password)
 	connection = db.cursor()
-	connection.execute("CREATE TABLE USERS(USERNAME VARCHAR(30) NOT NULL PRIMARY KEY, PASSWORD VARCHAR(30));")
-	db.close()
+	connection.execute('SHOW DATABASES LIKE "noteCV";')
+	results = connection.fetchall()
+	if len(results) == 0:
+		connection.execute('CREATE DATABASE IF NOT EXISTS noteCV;')
+		connection.execute("CREATE TABLE noteCV.USERS (USERNAME VARCHAR(30) NOT NULL PRIMARY KEY, PASSWORD VARCHAR(30));")
+		connection.execute("CREATE TABLE noteCV.NOTES (fpath VARCHAR(100), fname VARCHAR(60), subject VARCHAR(50));")
+		connection.execute("CREATE TABLE noteCV.subjects (Subject VARCHAR(40) NOT NULL);")
+
+#	db.close()
 
 subjectArray = []
 alltopics = []
@@ -126,7 +138,8 @@ class Window(QtGui.QWidget):
 		username = self.unameInp.text()
 		password = self.passwdInp.text()
 
-		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+		global dbPassword
+		db = MySQLdb.connect("localhost", "root", dbPassword, "noteCV")
 		connection = db.cursor()
 	
 		result = connection.execute("SELECT * FROM USERS WHERE USERNAME = %s AND PASSWORD = %s",(username, password))
@@ -214,7 +227,8 @@ class NoteWidget(QtGui.QWidget):
 		self.setGeometry(240,190,WIDTH-220,HEIGHT-190)
 		self.show()
 
-		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+		global dbPassword
+		db = MySQLdb.connect("localhost", "root", dbPassword, "noteCV")
 		connection = db.cursor()
 		temp = connection.execute("SELECT fname,fpath FROM NOTES WHERE Subject=%s;",(subject))
 		results = connection.fetchall()
@@ -346,7 +360,8 @@ class Dashboard(QtGui.QWidget):
 	# A method that displays currently added subjects
 	def displaySubjects(self):
 
-		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+		global dbPassword
+		db = MySQLdb.connect("localhost", "root", dbPassword, "noteCV")
 		connection = db.cursor()
 		temp = connection.execute("SELECT * FROM subjects;")
 		result = connection.fetchall()
@@ -373,8 +388,8 @@ class Dashboard(QtGui.QWidget):
 
 		if newSubject == '' or newSubject == ' ':
 			return
-
-		db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+		global dbPassword
+		db = MySQLdb.connect("localhost", "root", dbPassword, "noteCV")
 		connection = db.cursor()
 		connection.execute("INSERT INTO subjects VALUES(%s);",(newSubject))
 		db.commit()
@@ -386,13 +401,19 @@ class Dashboard(QtGui.QWidget):
 ###########################################################################################################
 
 # The main function
-def main():
+def main(pw):
 
+	createDatabase(pw)
 	mainApplication = QtGui.QApplication(sys.argv)
 	LoginWindow = MainWindow()
 	LoginWindow.show()
 	sys.exit(mainApplication.exec_())
 
 
-if __name__ == '__main__':
-	main()
+
+if len(sys.argv) < 2:
+	print ("Please enter python run.py <your password>")
+	sys.exit()
+
+dbPassword = sys.argv[1]
+main(sys.argv[1])
