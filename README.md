@@ -1,5 +1,5 @@
 # noteCV
-A kind of smart note-making software.
+A kind of smart and user-interactive note-making software application.
 
 ## Description
 noteCV is a smart note taking application made in python to help students all across the globe to take notes easily and effectively. The software is a complete package that enables students to take down and record notes (with interactive interface to make diagrams and graphs). Besides this, it also helps them share notes with each other. 
@@ -27,3 +27,10 @@ noteCV is a smart note taking application made in python to help students all ac
 7. Ability to save notebook as pdf.
 8. Display of current user online to enable easy share of notes.
 9. Peer to peer notes sharing.
+
+## Screenshot :
+![DASHBOARD](Dashboard.png)
+
+
+
+![EDITOR](editor.png)
