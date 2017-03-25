@@ -26,7 +26,7 @@ except AttributeError:
 
 #######################################################################################################
 
-dbPassword = None
+
 # Global method to create database
 def createDatabase(passwd):
 
@@ -43,6 +43,8 @@ def createDatabase(passwd):
 		connection.execute("CREATE TABLE noteCV.USERS (USERNAME VARCHAR(30) NOT NULL PRIMARY KEY, PASSWORD VARCHAR(30));")
 		connection.execute("CREATE TABLE noteCV.NOTES (fpath VARCHAR(100), fname VARCHAR(60), subject VARCHAR(50));")
 		connection.execute("CREATE TABLE noteCV.subjects (Subject VARCHAR(40) NOT NULL);")
+		connection.execute("INSERT INTO noteCV.USERS VALUES('user','user');")
+		db.commit()
 
 #	db.close()
 
@@ -277,7 +279,7 @@ class NoteWidget(QtGui.QWidget):
 			self.label.show() # Remove previous
 			button.show()
 			x += 120
-			if x >= 1250:
+			if x >= 1140:
 				y += 140
 				x = 60
 			i += 1

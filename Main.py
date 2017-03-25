@@ -279,7 +279,7 @@ class Editor(QtGui.QMainWindow) :
 
 
 	def openFile(self,filename) :
-		with open(self.filename,"rt") as file:
+		with open(filename,"rt") as file:
 			self.textWidget.textEditor.setText(file.read())
 
 	def performSave(self):
@@ -299,7 +299,7 @@ class Editor(QtGui.QMainWindow) :
 
 			self.changesSaved = True
 
-			db = MySQLdb.connect("localhost", "root", "mosfet", "noteCV")
+			db = MySQLdb.connect("localhost", "root", "root", "noteCV")
 			connection = db.cursor()
 			temp = connection.execute("SELECT fname,subject FROM NOTES WHERE fpath=%s and Subject=%s;",(str(self.filename),str(gSubject)))
 			results = connection.fetchall()
