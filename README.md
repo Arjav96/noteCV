@@ -1,4 +1,6 @@
 # noteCV
+### <i> (Project under Hack In the North 2.0) </i>
+
 A kind of smart and user-interactive note-making software application.
 
 ## Description
